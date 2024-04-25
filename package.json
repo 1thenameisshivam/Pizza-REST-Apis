@@ -2,8 +2,10 @@
   "name": "restapis_ecom",
   "version": "1.0.0",
   "description": "REST APIS for e-com",
+  "type": "module",
   "main": "server.js",
   "scripts": {
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "shivam kumar <1thenameisshivam@gmail.com>",
