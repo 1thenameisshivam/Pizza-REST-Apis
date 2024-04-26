@@ -27,7 +27,7 @@ const registerController = async (req, res, next) => {
     try {
       const user = await userModel.findOne({ email });
       if (user) {
-        return next(createError(400, "User already exists"));
+        return next(createError(409, "User already exists"));
       }
     } catch (err) {
       return next(createError(500, "Error registering user"));
