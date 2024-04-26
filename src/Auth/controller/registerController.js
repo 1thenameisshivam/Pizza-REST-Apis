@@ -3,6 +3,8 @@ import userModel from "../model/userModel.js";
 import createError from "http-errors";
 import bcrypt from "bcrypt";
 import { jwtService } from "../../services/jwtService.js";
+import { REFRESH_SECRET } from "../../config/index.js";
+import refreshTokenModel from "../model/refreshTokenModel.js";
 const registerController = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -49,6 +51,7 @@ const registerController = async (req, res, next) => {
 
     // user creation
     let token;
+    let refresh_token;
     try {
       const user = await userModel.create({
         name,
@@ -58,6 +61,17 @@ const registerController = async (req, res, next) => {
       // token generation from jwt
       try {
         token = jwtService({ userId: user._id, role: user.role });
+        refresh_token = jwtService(
+          { userId: user._id, role: user.role },
+          "1y",
+          REFRESH_SECRET
+        );
+        // saving refresh token
+        try {
+          await refreshTokenModel.create({ token: refresh_token });
+        } catch (err) {
+          return next(createError(500, "Error saving refresh token"));
+        }
       } catch (err) {
         return next(createError(500, "Error in toke generation"));
       }
@@ -69,6 +83,7 @@ const registerController = async (req, res, next) => {
     res.json({
       message: "User registered successfully",
       token,
+      refresh_token,
     });
   } catch (err) {
     return next(createError(500, "Error registering user" + err));
